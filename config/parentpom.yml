@@ -1,0 +1,15 @@
+springVersion: "2.7.4"
+groupId: com.mik.test
+artifactId: parent
+version: 0.0.1-SNAPSHOT
+name: parent
+description: "parent project"
+packaging: jar
+modules:
+    gateway:
+        name: gatewayname
+    user:
+        name: username
+    authentication:
+        name: auth
+             
