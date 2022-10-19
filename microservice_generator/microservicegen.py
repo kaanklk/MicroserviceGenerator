@@ -15,8 +15,6 @@
 # If not, see <https://www.gnu.org/licenses/>.  
 #
 
-# python .\microservicegen.py -c D:\University\Thesis\MicroserviceGenerator\config\parentpom.yml  -t D:\University\Thesis\MicroserviceGenerator\template\parentpom.ftl -o D:\University\Thesis\MicroserviceGenerator\target
-
 import argparse
 import yaml
 from pathlib import Path
