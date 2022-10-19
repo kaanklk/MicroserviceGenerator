@@ -27,6 +27,7 @@ def create_module(templatepath,outputpath,root):
 
     groupid = root["groupId"].split(".")
     modules = root["modules"]
+    groupIdName = root["groupId"]
 
     if(os.path.exists(outputpath) != True):
         os.mkdir(outputpath.as_posix())
@@ -38,11 +39,15 @@ def create_module(templatepath,outputpath,root):
         try:
             f = open("moduleconfig.yml","a")
             f.write(yaml.dump(module))
+            f.write(yaml.dump({"groupId" : groupIdName}))
             f.close()
-            os.system("freemarker-cli -t "+str(templatepath.as_posix())+"/module_pom.ftl "+"moduleconfig.yml "+"-o pom.xml")
+            os.system("freemarker-cli -t "+str(templatepath.as_posix())+"/module_pom.ftl "+
+            "moduleconfig.yml "+"-o pom.xml")
             #os.remove("moduleconfig.yml")
         except Exception as e:
             print(e)
+
+        module_cwd = os.getcwd()
         
         if (root.get("java") != None):
             os.makedirs("./src/main/java")
@@ -51,11 +56,16 @@ def create_module(templatepath,outputpath,root):
             os.makedirs("./src/main/kotlin")
             os.chdir("./src/main/kotlin")
 
+
         for group in groupid:
             os.mkdir(group)
             os.chdir(group)
             if(group == groupid[-1]):
                 os.mkdir(module["artifactId"])
+                os.chdir(module["artifactId"])
+                if (root.get("java") != None):
+                    os.system("freemarker-cli -t "+str(templatepath.as_posix())+"/app_application.ftl "+
+                    module_cwd+"/moduleconfig.yml "+"-o "+module["artifactId"]+"Application.java")
 
         os.chdir(outputpath.as_posix())
     
