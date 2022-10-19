@@ -15,69 +15,23 @@
 # If not, see <https://www.gnu.org/licenses/>.  
 #
 
+# python .\microservicegen.py -c D:\University\Thesis\MicroserviceGenerator\config\parentpom.yml  -t D:\University\Thesis\MicroserviceGenerator\template\parentpom.ftl -o D:\University\Thesis\MicroserviceGenerator\target
+
 import argparse
-import os
 import yaml
 from pathlib import Path
-import traceback
+import create_module as cm  
 
-def create_skeleton(configpath, templatepath, outputpath,data):
-    try:
-        os.mkdir(outputpath)
-        os.chdir(outputpath)
-    except Exception:
-        print("Failed to create output directory!")
-        print(traceback.format_exc())
-
-    try:
-        groupid = data["groupId"].split(".")
-    except Exception:
-        print("Please determine groupId properly in config file!")
-        print(traceback.format_exc())
-
-    
-    try:
-        print("Generating folder structure...")
-        for module in data["modules"]:
-            os.makedirs(str(outputpath.absolute())+"/%s/src/main/java/" % module)
-            os.makedirs(str(outputpath.absolute())+"/%s/src/main/resources/" % module)
-            os.makedirs(str(outputpath.absolute())+"/%s/src/test/java/" % module)
-            for type in {"main","test"}:
-                if type == "main":
-                    os.chdir(str(outputpath.absolute())+"/%s/src/main/java/" % module)
-                    for group in groupid:
-                        os.mkdir(group)
-                        os.chdir(group)
-                elif type == "test":
-                    os.chdir(str(outputpath.absolute())+"/%s/src/test/java/" % module)
-                    for group in groupid:
-                        os.mkdir(group)
-                        os.chdir(group)
-        print("Folder structure generated successfully!")
-    except Exception:
-        print("Failed to create folder structure for each module!")
-        print(traceback.format_exc())
-    
-    try:
-        print("Generating parent pom file...")
-        os.chdir(outputpath)
-        os.system("freemarker-cli -t %s %s -o %s" % (str(templatepath.as_posix()), str(configpath.as_posix()), str(outputpath.as_posix()+"\pom.xml") ))
-        print("Parent pom.xml is generated successfully!")
-    except Exception:
-        print("Failed to generate parent pom.xml!")
-        print(traceback.format_exc())
-        
-
+# Reading config.yaml file from configpath
 def read_config(configpath):
     try:
         with open(configpath, 'r') as conf:
-            data = yaml.safe_load(conf)
-    except Exception:
+            root = yaml.safe_load(conf)
+        return root
+            
+    except Exception as e:
         print("Failed to load yaml file! Please check the file again!")
-        print(traceback.format_exc())
-
-    return data
-
+        print(e)
 
 def parse_args():
 
@@ -92,11 +46,9 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
     configpath = Path(args.Config)
-
     templatepath = Path(args.Template)
-
     outputpath = Path(args.Output)
     
-    data = read_config(configpath)
-    
-    create_skeleton(configpath, templatepath, outputpath,data)
+    root = read_config(configpath)
+    cm.create_module(templatepath=templatepath,outputpath=outputpath,root=root)
+

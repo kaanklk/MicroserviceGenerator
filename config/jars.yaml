@@ -1,0 +1,118 @@
+artifacts:
+  - artifactId: spring-boot-starter-web
+    groupId: org.springframework.boot
+  - artifactId: spring-boot-starter-security
+    groupId: org.springframework.boot
+  - artifactId: spring-boot-starter-actuator
+    groupId: org.springframework.boot
+  - artifactId: spring-boot-starter-test
+    groupId: org.springframework.boot
+  - artifactId: spring-boot-starter-data-jpa
+    groupId: org.springframework.boot
+  - artifactId: spring-boot-starter-data-redis
+    groupId: org.springframework.boot
+  - artifactId: spring-security-core
+    groupId: org.springframework.security
+  - artifactId: spring-webmvc
+    groupId: org.springframework
+  - artifactId: spring-cloud-starter-gateway
+    groupId: org.springframework.cloud
+    version: latest
+  - artifactId: kotlin-maven-allopen
+    groupId: org.jetbrains.kotlin
+    version: latest
+  - artifactId: kotlin-test
+    groupId: org.jetbrains.kotlin
+    version: latest
+  - artifactId: kotlin-stdlib-jdk8
+    groupId: org.jetbrains.kotlin
+    version: latest
+  - artifactId: lombok
+    groupId: org.projectlombok
+    version: latest
+  - artifactId: hibernate-jpamodelgen
+    groupId: org.hibernate
+    version: latest
+  - artifactId: hibernate-envers
+    groupId: org.hibernate.orm
+    version: latest
+  - artifactId: mapstruct
+    groupId: org.mapstruct
+    version: latest
+  - artifactId: postgresql
+    groupId: org.postgresql
+    version: latest
+  - artifactId: micrometer-core
+    groupId: io.micrometer
+    version: latest
+  - artifactId: micrometer-registry-prometheus
+    groupId: io.micrometer
+    version: latest
+  - artifactId: springfox-boot-starter
+    groupId: io.springfox
+    version: latest
+  - artifactId: javax.servlet-api
+    groupId: javax.servlet
+    version: latest
+  - artifactId: modelmapper
+    groupId: org.modelmapper
+    version: latest
+  - artifactId: keycloak-spring-boot-starter
+    groupId: org.keycloak
+    version: latest
+  - artifactId: problem-spring-web
+    groupId: org.zalando
+    version: latest
+  - artifactId: spring-cloud-services-dependencies
+    groupId: io.pivotal.spring.cloud
+    version: latest
+  - artifactId: spring-cloud-dependencies
+    groupId: org.springframework.cloud
+    version: latest
+  - artifactId: springdoc-openapi-ui
+    groupId: org.springdoc
+    version: latest
+  - artifactId: mapstruct-processor
+    groupId: org.mapstruct
+    version: latest
+  - artifactId: spring-cloud-services-starter-service-registry
+    groupId: io.pivotal.spring.cloud
+    version: latest
+  - artifactId: spring-cloud-starter-netflix-eureka-server
+    groupId: org.springframework.cloud
+    version: latest
+  - artifactId: jackson-annotations
+    groupId: com.fasterxml.jackson.core
+    version: latest
+plugins:
+  - artifactId: maven-compiler-plugin
+    groupId: org.apache.maven.plugins
+    version: latest
+    annotations:
+      - annotation: "lombok"
+      - annotation: "hibernate-jpamodelgen"
+      - annotation: "mapstruct-processor"
+  - artifactId: spring-boot-maven-plugin
+    groupId: org.springframework.boot
+    version: latest
+  - artifactId: maven-deploy-plugin
+    groupId: org.apache.maven.plugins
+    version: latest
+  - artifactId: maven-resources-plugin
+    groupId: org.apache.maven.plugins
+    version: latest
+  - artifactId: kotlin-maven-plugin
+    groupId: org.jetbrains.kotlin
+    version: latest
+  - artifactId: maven-jar-plugin
+    groupId: org.apache.maven.plugins
+    version: latest
+  - artifactId: git-commit-id-plugin
+    groupId: pl.project13.maven
+    version: latest
+  - artifactId: dokka-maven-plugin
+    groupId: org.jetbrains.dokka
+    version: latest
+  - artifactId: jib-maven-plugin
+    groupId: com.google.cloud.tools
+    version: latest

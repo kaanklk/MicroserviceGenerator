@@ -1,0 +1,236 @@
+artifactId: stdemo
+groupId: org.stdemo
+version: 1.0.0-SNAPSHOT
+name: Spring template project
+description: Spring Template demo data model
+database:
+  type: postgresql
+  enversListener: org.stdemo.domains.domain.envers.StpDemoRevisionListener
+springProfiles:
+    - profile: "dev"
+      baseurl: "localhost"
+      baseport: "8080"
+      db:
+        host: "localhost"
+        port: "5432"
+        user: "demo"
+        password: "demo123"
+      eureka: http://localhost:@port.registry@/eureka/
+      constants:
+        - const: "devprof"
+          value: "45"
+    - profile: "uat"
+      baseurl: "https://stdemo.com"
+      baseport: "8444"
+      db:
+        host: "uat.stdemo.com"
+        port: "35432"
+        user: "demouat"
+        password: "demouat123"
+      eureka: http://@registry@:@port.registry@/eureka/
+      constants:
+        - const: "uatprof"
+          value: "44"
+    - profile: "prod"
+      baseurl: "https://stdemo.com"
+      baseport: "8443"
+      db:
+        host: "stdemo.com"
+        port: "45432"
+        user: "demoprod"
+        password: "demoprod123"
+      eureka: http://@registry@:@port.registry@/eureka/
+      constants:
+        - const: "prodprof"
+          value: "43"
+
+constants:
+  - const: "nexus.release.url"
+    value: "https://stdemo.com:33771/repository/maven-releases"
+  - const: "nexus.snapshot.url"
+    value: "https://sstdemo.com:33771/repository/maven-snapshots"
+  - const: "sonar.host"
+    value: "https://stdemo.com:9000"
+
+java:
+  version: 17
+  compiler:
+    target: 8
+  source:
+    encoding: utf-8
+
+kotlin:
+  version: 1.6.21
+
+spring:
+    version: 2.7.0
+
+modules:
+  - artifactId: "stdemo-registry"
+    name: "Registry service"
+    description: "Registry description"
+    version: 1.0.0-SNAPSHOT
+    port: "8761"
+    dependencies:
+      - dep: spring-boot-starter-web
+      - dep: spring-boot-starter-security
+      - dep: spring-cloud-services-starter-service-registry
+      - dep: spring-cloud-starter-netflix-eureka-server
+      - dep: spring-boot-starter-actuator
+      - dep: micrometer-core
+      - dep: spring-boot-starter-test
+    plugins:
+      - plugin: maven-resources-plugin
+      - plugin: spring-boot-maven-plugin
+        skip: "false"
+        fork: "true"
+      - plugin: kotlin-maven-plugin
+      - plugin: maven-jar-plugin
+      - plugin: git-commit-id-plugin
+      - plugin: dokka-maven-plugin
+      - plugin: maven-compiler-plugin
+    developers:
+      - developer: Zamek
+        roles:
+          - role: developer
+      - developer: Kaan
+        roles:
+          - role: developer
+  - artifactId: "stdemo-gateway"
+    port: "8080"
+    dependencies:
+      - dep: spring-boot-starter-web
+      - dep: spring-boot-starter-security
+      - dep: spring-cloud-starter-gateway
+    version: 1.0.0-SNAPSHOT
+  - artifactId: "stdemo-common"
+    version: 1.0.0-SNAPSHOT
+    dependencies:
+      - dep: spring-boot-starter-data-jpa
+      - dep: jackson-annotations
+        scope: compile
+      - dep: hibernate-envers
+      - dep: spring-security-core
+        scope: provided
+      - dep: hibernate-jpamodelgen
+        scope: provided
+      - dep: problem-spring-web
+      - dep: spring-webmvc
+        scope: provided
+      - dep: javax.servlet-api
+        scope: provided
+      - dep: spring-boot-starter-data-redis
+  - artifactId: "stdemo-domain"
+    version: 1.0.0-SNAPSHOT
+    dependencies:
+      - dep: spring-boot-starter-data-jpa
+      - dep: jackson-annotations
+      - dep: hibernate-envers
+  - artifactId: "stdemo-admin"
+    version: 1.0.0-SNAPSHOT
+    modules:
+      - artifactId: "stdemo-admin-api"
+        version: 1.0.0-SNAPSHOT
+        dependencies:
+          - dep: spring-boot-starter-data-jpa
+          - dep: jackson-annotations
+          - dep: hibernate-envers
+          - dep: spring-boot-starter-test
+        plugins:
+          - plugin: maven-compiler-plugin
+          - plugin: spring-boot-maven-plugin
+            skip: "true"
+            fork: "false"
+          - plugin: jib-maven-plugin
+            skip: "true"
+      - artifactId: "stdemo-admin-service"
+        version: 1.0.0-SNAPSHOT
+        port: "8082"
+        dependencies:
+          - dep: spring-boot-starter-web
+          - dep: spring-boot-starter-security
+          - dep: spring-cloud-services-starter-service-registry
+          - dep: spring-cloud-starter-netflix-eureka-server
+          - dep: spring-boot-starter-actuator
+          - dep: micrometer-core
+          - dep: spring-boot-starter-test
+        plugins:
+          - plugin: maven-resources-plugin
+          - plugin: spring-boot-maven-plugin
+          - plugin: kotlin-maven-plugin
+          - plugin: maven-jar-plugin
+          - plugin: git-commit-id-plugin
+          - plugin: dokka-maven-plugin
+          - plugin: maven-compiler-plugin
+          - plugin: jib-maven-plugin
+    developers:
+      - developer: Zamek
+        roles:
+          - role: developer
+      - developer: Kaan
+        roles:
+          - role: developer
+
+jars:
+  - jar: spring-cloud-services-dependencies
+    version: latest
+
+repositories:
+    docker: 
+        host: "stdemo.com:33768"
+        baseimage: "stdemo.com:33769/openjdk:11"
+    source: "gitlab.com/zamek"
+    repositories:
+      - repo: mvnrepository
+      - repo: springRelease
+      - repo: jcenter
+        plugin: "true"
+      - repo: "cube-release"
+        name: "Cube release"
+        distribution: "true"
+        release: "true"
+        url: ${nexus.release.url}
+        username: "dev"
+        password: "pwd"
+      - repo: "cube-snapshot"
+        name: "Cube snapshot"
+        distribution: "true"
+        snapshot: "true"
+        url: ${nexus.snapshot.url}
+        username: "dev"
+        password: "pwd"
+
+profiles:
+  - profile: mvnrepository
+    active: "true"
+    repositories:
+      - repo: jcenter
+      - repo: "mvnrepository"
+      - repo: "springrelease"
+      - repo: "cube-release"
+        name: "Cube release"
+        url: ${nexus.release.url}
+      - repo: "cube-snapshot"
+        name: "Cube snapshot"
+        url: ${nexus.snapshot.url}
+  - profile: "sonar"
+    activeByDefault: "false"
+    url: "${sonar.host}"
+    hash:  b1d54c36271a6c880d5e83c29dec4810f059ca05
+
+developers:  
+  - Kaan:
+    name: Kaan Kulak
+    email: xxx@mail.com
+    roles:
+      - developer
+  - zamek:
+    name: Zoltan Zidarics
+    email: xxx@mail.com
+    roles:
+      - developer
+  - John:
+    name: John 
+    email: xxx@mail.com
+    roles:
+      - tester
