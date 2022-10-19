@@ -40,7 +40,7 @@ def create_module(templatepath,outputpath,root):
             f.write(yaml.dump(module))
             f.close()
             os.system("freemarker-cli -t "+str(templatepath.as_posix())+"/module_pom.ftl "+"moduleconfig.yml "+"-o pom.xml")
-            os.remove("moduleconfig.yml")
+            #os.remove("moduleconfig.yml")
         except Exception as e:
             print(e)
         
