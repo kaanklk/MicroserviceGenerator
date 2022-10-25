@@ -23,7 +23,7 @@ import yaml
 freemarker = "freemarker-cli -t"
 
 # Start generating modules
-def create_module(templatepath,outputpath,root,configpath): 
+def cmodule(templatepath,outputpath,root,configpath): 
 
     print("Creating modules...")
 

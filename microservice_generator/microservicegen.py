@@ -21,7 +21,7 @@ from pathlib import Path
 import create_module as cm  
 
 # Reading config.yaml file from configpath
-def read_config(configpath):
+def rconf(configpath):
     try:
         with open(configpath, 'r') as conf:
             root = yaml.safe_load(conf)
@@ -31,7 +31,7 @@ def read_config(configpath):
         print("Failed to load yaml file! Please check the file again!")
         print(e)
 
-def parse_args():
+def pargs():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--Template", help = "Determine template location", required=False)
@@ -42,11 +42,11 @@ def parse_args():
 
 
 if __name__ == "__main__":
-    args = parse_args()
+    args = pargs()
     configpath = Path(args.Config)
     templatepath = Path(args.Template)
     outputpath = Path(args.Output)
     
-    root = read_config(configpath)
-    cm.create_module(templatepath=templatepath,outputpath=outputpath,root=root,configpath=configpath)
+    root = rconf(configpath)
+    cm.cmodule(templatepath=templatepath,outputpath=outputpath,root=root,configpath=configpath)
 
