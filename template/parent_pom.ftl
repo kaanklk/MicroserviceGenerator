@@ -1,6 +1,5 @@
-<#assign map = YamlTool.parse(Documents.get(0))>
-
 <?xml version="1.0" encoding="UTF-8"?>
+<#assign map = YamlTool.parse(Documents.get(0))>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -89,7 +88,7 @@
             <url>https://mvnrepository.com</url>
             <name>Maven Repositories</name>
             <#elseif repos.repo == "springRelease">
-            <url>https://repo.spring.io/release<url>
+            <url>https://repo.spring.io/release</url>
             <name>Spring Release</name>
             <#elseif repos.repo == "jcenter">
             <url>https://jcenter.bintray.org</url>
@@ -126,6 +125,7 @@
 
     <#if map.modules??>
     <dependencyManagement>
+        <dependencies>
     <#list map.modules as row>
         <#if row.dependencies??>
         <#list row.dependencies as deps>
@@ -135,6 +135,7 @@
         </#list>
         </#if>
     </#list>
+        </dependencies>
     </dependencyManagement>
     </#if>
 
