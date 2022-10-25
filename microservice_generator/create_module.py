@@ -20,8 +20,8 @@ from operator import mod
 import os
 import yaml
 
-
-def create_module(templatepath,outputpath,root): 
+# Start generating modules
+def create_module(templatepath,outputpath,root,configpath): 
 
     print("Creating modules...")
 
@@ -29,14 +29,26 @@ def create_module(templatepath,outputpath,root):
     modules = root["modules"]
     groupidname = root["groupId"]
 
+    gparentmod(templatepath,outputpath,root,configpath)
     gmodules(templatepath, outputpath, root, groupid, modules, groupidname)
 
+#reading moduleconfig
+def rmoduleconf():
+    try:
+        with open("moduleconfig.yml",'r') as mconf:
+            mroot = yaml.safe_load(mconf)
+        return mroot
+    except Exception as e:
+        print(e)
+
+
+# Generate project modules and pom files
 def gmodules(templatepath, outputpath, root, groupid, modules, groupidname):
-    if(os.path.exists(outputpath) != True):
-        os.mkdir(outputpath.as_posix())
-    os.chdir(outputpath.as_posix())
+
+    submoduleflag = False
 
     for module in modules:
+        os.chdir(outputpath.as_posix())
         os.mkdir(module["artifactId"])
         os.chdir(module["artifactId"])
         try:
@@ -44,28 +56,64 @@ def gmodules(templatepath, outputpath, root, groupid, modules, groupidname):
             f.write(yaml.dump(module))
             f.write(yaml.dump({"groupId" : groupidname}))
             f.close()
-            os.system("freemarker-cli -t "+str(templatepath.as_posix())+"/module_pom.ftl "+
-            "moduleconfig.yml "+"-o pom.xml")
-            #os.remove("moduleconfig.yml")
+            if submoduleflag == False:
+                os.system("freemarker-cli -t "+str(templatepath.as_posix())+"/module_pom.ftl "+
+                "moduleconfig.yml "+"-o pom.xml")
+            mroot = rmoduleconf()
+            if(mroot.get("modules") != None):
+                submoduleflag = True
+                for submodule in mroot["modules"]:
+                    os.mkdir(submodule["artifactId"])
+                    os.chdir(submodule["artifactId"])
+                    try:
+                        f = open("moduleconf.yml","a")
+                        f.write(yaml.dump(submodule))
+                        f.write(yaml.dump({"groupId" : groupidname}))
+                        f.close()
+                        os.system("freemarker-cli -t "+str(templatepath.as_posix())+"/module_pom.ftl "+
+                        "moduleconf.yml "+"-o pom.xml")
+                    except Exception as e:
+                        print(e)
+                            
+                    gmodstr(templatepath,mroot,groupid,submodule)
+
+                    os.chdir(outputpath.as_posix())
+                    os.chdir(module["artifactId"])
+            else:
+                submoduleflag = False
+
         except Exception as e:
             print(e)
 
-        gmodstr(templatepath, root, groupid, module)
+        if submoduleflag != True:
+            gmodstr(templatepath, root, groupid, module)
 
         os.chdir(outputpath.as_posix())
     
     print("Modules are generated successfully!")
 
+def gparentmod(templatepath, outputpath, root, configpath):
+
+    if(os.path.exists(outputpath) != True):
+        os.mkdir(outputpath.as_posix())
+    
+    os.chdir(outputpath.as_posix())
+    os.mkdir(root["artifactId"]+"-parent")
+    os.chdir(root["artifactId"]+"-parent")
+    os.system("freemarker-cli -t "+str(templatepath.as_posix())+"/parent_pom.ftl "+
+                        configpath.as_posix()+" -o"+" pom.xml")
+    
+
+# Generate module stucture and application code
 def gmodstr(templatepath, root, groupid, module):
     module_cwd = os.getcwd()
         
-    if (root.get("java") != None):
-        os.makedirs("./src/main/java")
-        os.chdir("./src/main/java")
-    elif(root.get("kotlin") != None):
+    if(root.get("kotlin") != None):
         os.makedirs("./src/main/kotlin")
         os.chdir("./src/main/kotlin")
-
+    else:
+        os.makedirs("./src/main/java")
+        os.chdir("./src/main/java")
 
     for group in groupid:
         os.mkdir(group)
@@ -76,10 +124,3 @@ def gmodstr(templatepath, root, groupid, module):
             if (root.get("java") != None):
                 os.system("freemarker-cli -t "+str(templatepath.as_posix())+"/app_application.ftl "+
                     module_cwd+"/moduleconfig.yml "+"-o "+module["artifactId"]+"Application.java")
-
-  
-
-
-
-        
-

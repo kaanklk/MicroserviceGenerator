@@ -48,5 +48,5 @@ if __name__ == "__main__":
     outputpath = Path(args.Output)
     
     root = read_config(configpath)
-    cm.create_module(templatepath=templatepath,outputpath=outputpath,root=root)
+    cm.create_module(templatepath=templatepath,outputpath=outputpath,root=root,configpath=configpath)
 
