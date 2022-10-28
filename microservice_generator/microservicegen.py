@@ -17,13 +17,14 @@
 
 import argparse
 import yaml
+import os
 from pathlib import Path
 import create_module as cm  
 
 # Reading config.yaml file from configpath
 def rconf(configpath):
     try:
-        with open(configpath, 'r') as conf:
+        with open(configpath.joinpath("config.yaml"), 'r') as conf:
             root = yaml.safe_load(conf)
         return root
             
@@ -35,7 +36,7 @@ def pargs():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--Template", help = "Determine template location", required=False)
-    parser.add_argument("-c", "--Config", help = "Determine config file" , required=False)
+    parser.add_argument("-c", "--Config", help = "Determine config path" , required=False)
     parser.add_argument("-o", "--Output", help = "Determine output directory", required=False)
 
     return parser.parse_args()
@@ -46,7 +47,7 @@ if __name__ == "__main__":
     configpath = Path(args.Config)
     templatepath = Path(args.Template)
     outputpath = Path(args.Output)
-    
+
     root = rconf(configpath)
     cm.cmodule(templatepath=templatepath,outputpath=outputpath,root=root,configpath=configpath)
 
