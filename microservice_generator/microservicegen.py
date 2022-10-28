@@ -17,7 +17,6 @@
 
 import argparse
 import yaml
-import os
 from pathlib import Path
 import create_module as cm  
 
