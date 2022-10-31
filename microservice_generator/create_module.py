@@ -16,7 +16,8 @@
 #
 
 
-from operator import mod
+from ensurepip import version
+from operator import index, mod
 import os
 import yaml
 
@@ -32,20 +33,43 @@ def cmodule(templatepath,outputpath,root,configpath):
     groupidname = root["groupId"]
 
     gparentmod(templatepath,outputpath,root,configpath)
-    gmodules(templatepath, outputpath, root, groupid, modules, groupidname)
+    gmodules(templatepath, outputpath, root, groupid, modules, groupidname,configpath)
 
 #reading moduleconfig
 def rmoduleconf():
     try:
         with open("moduleconfig.yml",'r') as mconf:
             mroot = yaml.safe_load(mconf)
+            mconf.close()
         return mroot
     except Exception as e:
         print(e)
 
+# reading jarsconfig
+def rjarsconf(configpath):
+    try:
+        with open(configpath.joinpath("jars.yaml") ,"r") as jconf:
+            jars = yaml.safe_load(jconf)
+            jconf.close()
+        return jars
+    except Exception as e:
+        print(e)
 
-# Generate project modules and pom files
-def gmodules(templatepath, outputpath, root, groupid, modules, groupidname):
+# update module conf
+def umoduleconf(jars):
+    print("Updating jars...")
+    mroot = rmoduleconf()
+    for artifacts in jars["artifacts"]:
+        for dependencies  in mroot["dependencies"]:
+            if dependencies["dep"] == artifacts["artifactId"]:
+                dependencies["groupId"] = artifacts["groupId"]
+
+    os.remove("moduleconfig.yml")
+    f = open("moduleconfig.yml","w")
+    f.write(yaml.dump(mroot))
+    f.close()
+
+def gmodules(templatepath, outputpath, root, groupid, modules, groupidname,configpath):
 
     submoduleflag = False
 
@@ -58,6 +82,11 @@ def gmodules(templatepath, outputpath, root, groupid, modules, groupidname):
             f.write(yaml.dump(module))
             f.write(yaml.dump({"groupId" : groupidname}))
             f.close()
+
+            # updating jars
+            jars = rjarsconf(configpath)
+            umoduleconf(jars)
+
             if submoduleflag == False:
                 os.system(freemarker+str(templatepath.as_posix())+"/module_pom.ftl "+
                 "moduleconfig.yml "+"-o pom.xml")
