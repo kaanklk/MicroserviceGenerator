@@ -57,12 +57,21 @@ def rjarsconf(configpath):
 
 # update module conf
 def umoduleconf(jars):
+    
     print("Updating jars...")
     mroot = rmoduleconf()
-    for artifacts in jars["artifacts"]:
-        for dependencies  in mroot["dependencies"]:
-            if dependencies["dep"] == artifacts["artifactId"]:
-                dependencies["groupId"] = artifacts["groupId"]
+    
+    if mroot.get("modules") != None:
+        for module in mroot["modules"]:
+            for dependencies in module["dependencies"]:
+                for artifacts in jars["artifacts"]:
+                    if dependencies["dep"] == artifacts["artifactId"]:
+                        dependencies["groupId"] = artifacts["groupId"]
+    else: 
+        for dependencies in mroot["dependencies"]:
+            for artifacts in jars["artifacts"]:
+                if dependencies["dep"] == artifacts["artifactId"]:
+                    dependencies["groupId"] = artifacts["groupId"]
 
     os.remove("moduleconfig.yml")
     f = open("moduleconfig.yml","w")
