@@ -16,10 +16,10 @@
 #
 
 
-from ensurepip import version
-from operator import index, mod
+import json
 import os
 import yaml
+import requests
 
 freemarker = "freemarker-cli -t"
 
@@ -31,14 +31,15 @@ def cmodule(templatepath,outputpath,root,configpath):
     groupid = root["groupId"].split(".")
     modules = root["modules"]
     groupidname = root["groupId"]
+    jars = rjarsconf(configpath)
 
-    gparentmod(templatepath,outputpath,root,configpath)
-    gmodules(templatepath, outputpath, root, groupid, modules, groupidname,configpath)
+    gparentmod(templatepath,outputpath,root,configpath,jars)
+    gmodules(templatepath, outputpath, root, groupid, modules, groupidname,jars)
 
 #reading moduleconfig
-def rmoduleconf():
+def rmoduleconf(moduleconf):
     try:
-        with open("moduleconfig.yml",'r') as mconf:
+        with open(moduleconf,'r') as mconf:
             mroot = yaml.safe_load(mconf)
             mconf.close()
         return mroot
@@ -55,30 +56,17 @@ def rjarsconf(configpath):
     except Exception as e:
         print(e)
 
-# update module conf
-def umoduleconf(jars):
-    
-    print("Updating jars...")
-    mroot = rmoduleconf()
-    
-    if mroot.get("modules") != None:
-        for module in mroot["modules"]:
-            for dependencies in module["dependencies"]:
-                for artifacts in jars["artifacts"]:
-                    if dependencies["dep"] == artifacts["artifactId"]:
-                        dependencies["groupId"] = artifacts["groupId"]
-    else: 
-        for dependencies in mroot["dependencies"]:
-            for artifacts in jars["artifacts"]:
-                if dependencies["dep"] == artifacts["artifactId"]:
-                    dependencies["groupId"] = artifacts["groupId"]
+def fndlatestversion(group, artifact):
+     rq = "https://search.maven.org/solrsearch/select?q=g:" + group +"+AND+a:" + artifact + "&wt=json"
+     response = requests.get(rq)
+     if response.status_code != 200:
+         return "UNKNOWN"
+     info = json.loads(response.text)
+     if len(info['response']['docs']) > 0:
+         return info['response']['docs'][0]['latestVersion']
+     return "UNKNOWN"
 
-    os.remove("moduleconfig.yml")
-    f = open("moduleconfig.yml","w")
-    f.write(yaml.dump(mroot))
-    f.close()
-
-def gmodules(templatepath, outputpath, root, groupid, modules, groupidname,configpath):
+def gmodules(templatepath, outputpath, root, groupid, modules, groupidname,jars):
 
     submoduleflag = False
 
@@ -92,14 +80,11 @@ def gmodules(templatepath, outputpath, root, groupid, modules, groupidname,confi
             f.write(yaml.dump({"groupId" : groupidname}))
             f.close()
 
-            # updating jars
-            jars = rjarsconf(configpath)
-            umoduleconf(jars)
 
             if submoduleflag == False:
                 os.system(freemarker+str(templatepath.as_posix())+"/module_pom.ftl "+
                 "moduleconfig.yml "+"-o pom.xml")
-            mroot = rmoduleconf()
+            mroot = rmoduleconf("moduleconfig.yml")
             if(mroot.get("modules") != None):
                 submoduleflag = True
                 for submodule in mroot["modules"]:
@@ -135,7 +120,7 @@ def gsubmodule(templatepath, outputpath, groupid, groupidname, module, mroot, su
     os.chdir(outputpath.as_posix())
     os.chdir(module["artifactId"])
 
-def gparentmod(templatepath, outputpath, root, configpath):
+def gparentmod(templatepath, outputpath, root, configpath,jars):
 
     if(os.path.exists(outputpath) != True):
         os.mkdir(outputpath.as_posix())
@@ -143,8 +128,32 @@ def gparentmod(templatepath, outputpath, root, configpath):
     os.chdir(outputpath.as_posix())
     os.mkdir(root["artifactId"]+"-parent")
     os.chdir(root["artifactId"]+"-parent")
+
+    ujars(root, jars)
+
     os.system(freemarker+str(templatepath.as_posix())+"/parent_pom.ftl "+
                         configpath.as_posix()+" -o"+" pom.xml")
+
+def ujars(root, jars):
+
+    print("Updating jars...")
+
+    for module in root["modules"]:
+        if module.get("dependencies") != None:
+            for dependency in module["dependencies"]:
+                for artifacts in jars["artifacts"]:
+                    if dependency["dep"] == artifacts["artifactId"]:
+                        dependency["groupId"] = artifacts["groupId"]
+                        if artifacts.get("version") != None and artifacts["version"] == "latest":
+                            dependency["version"] = fndlatestversion(dependency["groupId"],dependency["dep"])
+        else:
+            for submodule in module["modules"]:
+                for dependency in submodule["dependencies"]:
+                    for artifacts in jars["artifacts"]:
+                        if dependency["dep"] == artifacts["artifactId"]:
+                            dependency["groupId"] = artifacts["groupId"]
+                            if artifacts.get("version") != None and artifacts["version"] == "latest":
+                                dependency["version"] = fndlatestversion(dependency["groupId"],dependency["dep"])
     
 
 # Generate module stucture and application code
