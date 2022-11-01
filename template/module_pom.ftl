@@ -35,6 +35,7 @@
         <#list map.dependencies as row>
         <dependency>
             <artifactId>${row.dep}</artifactId>
+            <groupId>${row.groupId}</groupId>
         </dependency>
         </#list>
     </dependencies>

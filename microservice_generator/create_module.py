@@ -80,7 +80,6 @@ def gmodules(templatepath, outputpath, root, groupid, modules, groupidname):
             f.write(yaml.dump({"groupId" : groupidname}))
             f.close()
 
-
             if submoduleflag == False:
                 os.system(freemarker+str(templatepath.as_posix())+"/module_pom.ftl "+
                 "moduleconfig.yml "+"-o pom.xml")
@@ -124,17 +123,16 @@ def gparentmod(templatepath, outputpath, root, configpath,jars):
 
     if(os.path.exists(outputpath) != True):
         os.mkdir(outputpath.as_posix())
-    
+
+    ujars(root, jars,configpath)
     os.chdir(outputpath.as_posix())
     os.mkdir(root["artifactId"]+"-parent")
     os.chdir(root["artifactId"]+"-parent")
 
-    ujars(root, jars)
-
     os.system(freemarker+str(templatepath.as_posix())+"/parent_pom.ftl "+
-                        configpath.as_posix()+" -o"+" pom.xml")
+                        configpath.as_posix()+"/uconfig.yaml"+" -o"+" pom.xml")
 
-def ujars(root, jars):
+def ujars(root, jars, configpath):
 
     print("Updating jars...")
 
@@ -154,7 +152,11 @@ def ujars(root, jars):
                             dependency["groupId"] = artifacts["groupId"]
                             if artifacts.get("version") != None and artifacts["version"] == "latest":
                                 dependency["version"] = fndlatestversion(dependency["groupId"],dependency["dep"])
-    
+
+    os.chdir(configpath.as_posix())
+    with open("uconfig.yaml","w") as f:
+        f.write(yaml.dump(root))
+        f.close()
 
 # Generate module stucture and application code
 def gmodstr(templatepath, root, groupid, module):

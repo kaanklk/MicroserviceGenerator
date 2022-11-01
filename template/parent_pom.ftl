@@ -131,6 +131,12 @@
         <#list row.dependencies as deps>
             <dependency>
                 <artifactId>${deps.dep}</artifactId>
+                <#if deps.groupId??>
+                <groupId>${deps.groupId}</groupId>
+                </#if>
+                <#if deps.version??>
+                <version>${deps.version}</version>
+                </#if>
             </dependency>
         </#list>
         </#if>
