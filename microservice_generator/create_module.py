@@ -34,7 +34,7 @@ def cmodule(templatepath,outputpath,root,configpath):
     jars = rjarsconf(configpath)
 
     gparentmod(templatepath,outputpath,root,configpath,jars)
-    gmodules(templatepath, outputpath, root, groupid, modules, groupidname,jars)
+    gmodules(templatepath, outputpath, root, groupid, modules, groupidname)
 
 #reading moduleconfig
 def rmoduleconf(moduleconf):
@@ -66,7 +66,7 @@ def fndlatestversion(group, artifact):
          return info['response']['docs'][0]['latestVersion']
      return "UNKNOWN"
 
-def gmodules(templatepath, outputpath, root, groupid, modules, groupidname,jars):
+def gmodules(templatepath, outputpath, root, groupid, modules, groupidname):
 
     submoduleflag = False
 
