@@ -21,6 +21,7 @@ import os
 from typing import final
 import yaml
 import requests
+import re
 
 freemarker = "freemarker-cli -t"
 
@@ -35,7 +36,7 @@ def cmodule(templatepath,outputpath,root,configpath):
     jars = rjarsconf(configpath)
 
     gparentmod(templatepath,outputpath,root,configpath,jars)
-    gmodules(templatepath, outputpath, root, groupid, modules, groupidname)
+    gmodules(templatepath, outputpath, root, groupid, modules, groupidname,configpath)
 
 #reading moduleconfig
 def rmoduleconf(moduleconf):
@@ -67,7 +68,7 @@ def fndlatestversion(group, artifact):
          return info['response']['docs'][0]['latestVersion']
      return "UNKNOWN"
 
-def gmodules(templatepath, outputpath, root, groupid, modules, groupidname):
+def gmodules(templatepath, outputpath, root, groupid, modules, groupidname,configpath):
 
     submoduleflag = False
 
@@ -88,7 +89,7 @@ def gmodules(templatepath, outputpath, root, groupid, modules, groupidname):
             if(mroot.get("modules") != None):
                 submoduleflag = True
                 for submodule in mroot["modules"]:
-                    gsubmodule(templatepath, outputpath, groupid, groupidname, module, submodule)
+                    gsubmodule(templatepath, outputpath, groupid, groupidname, module, submodule,configpath)
             else:
                 submoduleflag = False
 
@@ -96,29 +97,29 @@ def gmodules(templatepath, outputpath, root, groupid, modules, groupidname):
             print(e)
 
         if submoduleflag != True:
-            gmodstr(templatepath, mroot, groupid, module)
+            gmodstr(templatepath, mroot, groupid, module, configpath)
 
         os.chdir(outputpath.as_posix())
     
     print("Modules are generated successfully!")
 
-def gsubmodule(templatepath, outputpath, groupid, groupidname, module, submodule):
+def gsubmodule(templatepath, outputpath, groupid, groupidname, module, submodule,configpath):
     os.mkdir(submodule["artifactId"])
     os.chdir(submodule["artifactId"])
     try:
-        f = open("moduleconf.yml","a")
+        f = open("moduleconfig.yml","a")
         f.write(yaml.dump(submodule))
         f.write(yaml.dump({"groupId" : groupidname}))
         f.close()
         os.system(freemarker+str(templatepath.as_posix())+"/module_pom.ftl "+
-                        "moduleconf.yml "+"-o pom.xml")
+                        "moduleconfig.yml "+"-o pom.xml")
 
-        smroot = rmoduleconf("moduleconf.yml")
+        smroot = rmoduleconf("moduleconfig.yml")
 
     except Exception as e:
         print(e)
-                            
-    gmodstr(templatepath,smroot,groupid,submodule)
+    
+    gmodstr(templatepath,smroot,groupid,submodule,configpath)
 
     os.chdir(outputpath.as_posix())
     os.chdir(module["artifactId"])
@@ -163,18 +164,18 @@ def ujars(root, jars, configpath):
         f.close()
 
 # Generate module stucture and application code
-def gmodstr(templatepath, root, groupid, module):
+def gmodstr(templatepath, root, groupid, module,configpath):
+
     module_cwd = os.getcwd()
 
     if root.get("port") != None:
         os.makedirs("./src/main/resources")
-        
-    if(root.get("kotlin") != None):
-        os.makedirs("./src/main/kotlin")
-        os.chdir("./src/main/kotlin")
-    else:
-        os.makedirs("./src/main/java")
-        os.chdir("./src/main/java")
+        os.chdir("./src/main/resources")
+        os.system(freemarker+str(templatepath.as_posix())+"/application_yaml.ftl "+
+                        configpath.as_posix()+"/config.yaml"+" -o"+" application.yaml")
+        os.chdir("../")
+        os.mkdir("java")
+        os.chdir("java")
    
     for group in groupid:
         os.mkdir(group)
@@ -182,6 +183,6 @@ def gmodstr(templatepath, root, groupid, module):
         if(group == groupid[-1]):
             os.mkdir(module["artifactId"])
             os.chdir(module["artifactId"])
-            if (root.get("java") != None):
-                os.system(freemarker+str(templatepath.as_posix())+"/app_application.ftl "+
-                    module_cwd+"/moduleconfig.yml "+"-o "+module["artifactId"]+"Application.java")
+            appname = re.sub(r'[^A-Za-z]','',module["artifactId"]).capitalize()
+            os.system(freemarker+str(templatepath.as_posix())+"/app_application.ftl "+
+                    module_cwd+"/moduleconfig.yml "+"-o "+appname+"Application.java")
