@@ -1,3 +1,4 @@
 .vscode/
 target/
 microservice_generator/__pycache__
+config/uconfig.yaml

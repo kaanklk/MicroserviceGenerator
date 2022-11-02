@@ -18,6 +18,7 @@
 
 import json
 import os
+from typing import final
 import yaml
 import requests
 
@@ -87,7 +88,7 @@ def gmodules(templatepath, outputpath, root, groupid, modules, groupidname):
             if(mroot.get("modules") != None):
                 submoduleflag = True
                 for submodule in mroot["modules"]:
-                    gsubmodule(templatepath, outputpath, groupid, groupidname, module, mroot, submodule)
+                    gsubmodule(templatepath, outputpath, groupid, groupidname, module, submodule)
             else:
                 submoduleflag = False
 
@@ -95,13 +96,13 @@ def gmodules(templatepath, outputpath, root, groupid, modules, groupidname):
             print(e)
 
         if submoduleflag != True:
-            gmodstr(templatepath, root, groupid, module)
+            gmodstr(templatepath, mroot, groupid, module)
 
         os.chdir(outputpath.as_posix())
     
     print("Modules are generated successfully!")
 
-def gsubmodule(templatepath, outputpath, groupid, groupidname, module, mroot, submodule):
+def gsubmodule(templatepath, outputpath, groupid, groupidname, module, submodule):
     os.mkdir(submodule["artifactId"])
     os.chdir(submodule["artifactId"])
     try:
@@ -111,10 +112,13 @@ def gsubmodule(templatepath, outputpath, groupid, groupidname, module, mroot, su
         f.close()
         os.system(freemarker+str(templatepath.as_posix())+"/module_pom.ftl "+
                         "moduleconf.yml "+"-o pom.xml")
+
+        smroot = rmoduleconf("moduleconf.yml")
+
     except Exception as e:
         print(e)
                             
-    gmodstr(templatepath,mroot,groupid,submodule)
+    gmodstr(templatepath,smroot,groupid,submodule)
 
     os.chdir(outputpath.as_posix())
     os.chdir(module["artifactId"])
@@ -161,6 +165,9 @@ def ujars(root, jars, configpath):
 # Generate module stucture and application code
 def gmodstr(templatepath, root, groupid, module):
     module_cwd = os.getcwd()
+
+    if root.get("port") != None:
+        os.makedirs("./src/main/resources")
         
     if(root.get("kotlin") != None):
         os.makedirs("./src/main/kotlin")
@@ -168,7 +175,7 @@ def gmodstr(templatepath, root, groupid, module):
     else:
         os.makedirs("./src/main/java")
         os.chdir("./src/main/java")
-
+   
     for group in groupid:
         os.mkdir(group)
         os.chdir(group)
