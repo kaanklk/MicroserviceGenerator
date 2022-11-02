@@ -176,6 +176,9 @@ def gmodstr(templatepath, root, groupid, module,configpath):
         os.chdir("../")
         os.mkdir("java")
         os.chdir("java")
+    else:
+        os.makedirs("./src/main/java")
+        os.chdir("./src/main/java")
    
     for group in groupid:
         os.mkdir(group)
