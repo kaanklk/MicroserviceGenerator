@@ -36,7 +36,7 @@ def cmodule(templatepath,outputpath,root,configpath):
     jars = rjarsconf(configpath)
 
     gparentmod(templatepath,outputpath,root,configpath,jars)
-    gmodules(templatepath, outputpath, root, groupid, modules, groupidname,configpath)
+    gmodules(templatepath, outputpath, groupid, modules, groupidname,configpath)
 
 #reading moduleconfig
 def rmoduleconf(moduleconf):
@@ -68,7 +68,7 @@ def fndlatestversion(group, artifact):
          return info['response']['docs'][0]['latestVersion']
      return "UNKNOWN"
 
-def gmodules(templatepath, outputpath, root, groupid, modules, groupidname,configpath):
+def gmodules(templatepath, outputpath, groupid, modules, groupidname,configpath):
 
     submoduleflag = False
 
@@ -165,6 +165,7 @@ def ujars(root, jars, configpath):
 
 # Generate module stucture and application code
 def gmodstr(templatepath, root, groupid, module,configpath):
+    istest = False
 
     module_cwd = os.getcwd()
 
@@ -173,13 +174,26 @@ def gmodstr(templatepath, root, groupid, module,configpath):
         os.chdir("./src/main/resources")
         os.system(freemarker+str(templatepath.as_posix())+"/application_yaml.ftl "+
                         configpath.as_posix()+"/config.yaml"+" -o"+" application.yaml")
-        os.chdir("../")
+        os.chdir("../..")
+        os.makedirs("test/java")
+        os.chdir("test/java")
+
+        istest = True
+        gengroup(templatepath, groupid, module, module_cwd,istest)
+        istest = False
+
+        os.chdir(module_cwd+"/src/main")
         os.mkdir("java")
         os.chdir("java")
+
     else:
         os.makedirs("./src/main/java")
         os.chdir("./src/main/java")
-   
+
+    gengroup(templatepath, groupid, module, module_cwd,istest)
+
+def gengroup(templatepath, groupid, module, module_cwd,istest):
+
     for group in groupid:
         os.mkdir(group)
         os.chdir(group)
@@ -187,5 +201,9 @@ def gmodstr(templatepath, root, groupid, module,configpath):
             os.mkdir(module["artifactId"])
             os.chdir(module["artifactId"])
             appname = re.sub(r'[^A-Za-z]','',module["artifactId"]).capitalize()
-            os.system(freemarker+str(templatepath.as_posix())+"/app_application.ftl "+
-                    module_cwd+"/moduleconfig.yml "+"-o "+appname+"Application.java")
+            if istest == False:
+                os.system(freemarker+str(templatepath.as_posix())+"/app_application.ftl "+
+                        module_cwd+"/moduleconfig.yml "+"-o "+appname+"Application.java")
+            else:
+                os.system(freemarker+str(templatepath.as_posix())+"/app_application_tests.ftl "+
+                        module_cwd+"/moduleconfig.yml "+"-o "+appname+"ApplicationTests.java")
