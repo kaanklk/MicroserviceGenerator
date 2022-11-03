@@ -69,17 +69,18 @@ ${constants.const}: ${constants.value}
 ---
     <#if map.springProfiles??>
     <#list map.springProfiles as profiles>
-        profiles: ${profiles.profile}
-            datasource: 
-                url: ${profiles.baseurl}
-                username: ${profiles.db.user}
-                password: ${profiles.db.password}
-                eureka:
-                client:
-                serviceUrl: 
-                defaultZone: ${profiles.eureka}
-                <#list profiles.constants as constants>
-                    ${constants.const}: ${constants.value}
-                </#list>
+    spring:
+    profiles: ${profiles.profile}
+        datasource: 
+        url: ${profiles.baseurl}
+        username: ${profiles.db.user}
+        password: ${profiles.db.password}
+        eureka:
+        client:
+        serviceUrl: 
+        defaultZone: ${profiles.eureka}
+        <#list profiles.constants as constants>
+            ${constants.const}: ${constants.value}
+        </#list>
     </#list>
     </#if>
