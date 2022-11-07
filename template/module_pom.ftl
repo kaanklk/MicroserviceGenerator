@@ -45,6 +45,7 @@ If not, see <https://www.gnu.org/licenses/>.
             <#list row.dependencies as dependencyrow>
             <dependency>
                 <artifactId>${dependencyrow.dep}</artifactId>
+                <groupId>${dependencyrow.groupId}</groupId>
             </dependency>
             </#list>
         </#list>

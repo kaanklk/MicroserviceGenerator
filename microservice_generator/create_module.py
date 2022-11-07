@@ -15,7 +15,6 @@
 # If not, see <https://www.gnu.org/licenses/>.  
 #
 
-
 import json
 import os
 from typing import final
@@ -28,14 +27,16 @@ freemarker = "freemarker-cli -t"
 # Start generating modules
 def cmodule(templatepath,outputpath,root,configpath): 
 
-    print("Creating modules...")
-
     groupid = root["groupId"].split(".")
     modules = root["modules"]
     groupidname = root["groupId"]
     jars = rjarsconf(configpath)
 
-    gparentmod(templatepath,outputpath,root,configpath,jars)
+    os.chdir(configpath.as_posix())
+    ujars(root,jars)
+
+    gparentmod(templatepath,outputpath,root,configpath)
+
     gmodules(templatepath, outputpath, groupid, modules, groupidname,configpath)
 
 #reading moduleconfig
@@ -69,6 +70,8 @@ def fndlatestversion(group, artifact):
      return "UNKNOWN"
 
 def gmodules(templatepath, outputpath, groupid, modules, groupidname,configpath):
+
+    print("Generating modules...")
 
     submoduleflag = False
 
@@ -124,12 +127,13 @@ def gsubmodule(templatepath, outputpath, groupid, groupidname, module, submodule
     os.chdir(outputpath.as_posix())
     os.chdir(module["artifactId"])
 
-def gparentmod(templatepath, outputpath, root, configpath,jars):
+def gparentmod(templatepath, outputpath, root, configpath):
+
+    print("Generating parent module...")
 
     if(os.path.exists(outputpath) != True):
         os.mkdir(outputpath.as_posix())
 
-    ujars(root, jars,configpath)
     os.chdir(outputpath.as_posix())
     os.mkdir(root["artifactId"]+"-parent")
     os.chdir(root["artifactId"]+"-parent")
@@ -137,7 +141,7 @@ def gparentmod(templatepath, outputpath, root, configpath,jars):
     os.system(freemarker+str(templatepath.as_posix())+"/parent_pom.ftl "+
                         configpath.as_posix()+"/uconfig.yaml"+" -o"+" pom.xml")
 
-def ujars(root, jars, configpath):
+def ujars(root, jars):
 
     print("Updating jars...")
 
@@ -158,7 +162,6 @@ def ujars(root, jars, configpath):
                             if artifacts.get("version") != None and artifacts["version"] == "latest":
                                 dependency["version"] = fndlatestversion(dependency["groupId"],dependency["dep"])
 
-    os.chdir(configpath.as_posix())
     with open("uconfig.yaml","w") as f:
         f.write(yaml.dump(root))
         f.close()
