@@ -1,7 +1,7 @@
 <#-- 
 
 
-maven_settings_xml.ftl This file is part of MicroserviceGenerator.
+gitlab_cli.ftl This file is part of MicroserviceGenerator.
 
 Copyright (C) 2022 Kaan Kulak
 
