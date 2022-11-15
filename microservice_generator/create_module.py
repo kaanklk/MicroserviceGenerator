@@ -85,6 +85,15 @@ def gmodules(templatepath, outputpath, groupid, modules, groupidname,configpath)
             f.write(yaml.dump({"groupId" : groupidname}))
             f.close()
 
+            os.system(freemarker+str(templatepath.as_posix())+"/gitlab_cli.ftl "+
+                        configpath.as_posix()+"/config.yaml"+" -o"+" .gitlab_ci.yaml")
+            
+            os.system(freemarker+str(templatepath.as_posix())+"/bitbucket_pipelines.ftl "+
+                        configpath.as_posix()+"/config.yaml"+" -o"+" bitbucket-pipelines.yaml")
+            
+            os.system(freemarker+str(templatepath.as_posix())+"/maven_settings_xml.ftl "+
+                        configpath.as_posix()+"/config.yaml"+" -o"+" maven_settings.xml")
+
             if submoduleflag == False:
                 os.system(freemarker+str(templatepath.as_posix())+"/module_pom.ftl "+
                 "moduleconfig.yml "+"-o pom.xml")
