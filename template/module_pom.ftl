@@ -29,8 +29,11 @@ If not, see <https://www.gnu.org/licenses/>.
     <artifactId>${map.artifactId}</artifactId>
     <version>${map.version}</version>
     <groupId>${map.groupId}</groupId>
-
+    <#if map.modules??>
     <packaging>pom</packaging>
+    <#else>
+    <packaging>jar</packaging>
+    </#if>
 
     <#if map.modules??>
     <modules>
