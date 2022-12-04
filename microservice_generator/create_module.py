@@ -154,6 +154,13 @@ def ujars(root, jars):
 
     print("Updating jars...")
 
+    ujardependencies(root, jars)
+
+    with open("uconfig.yaml","w") as f:
+        f.write(yaml.dump(root))
+        f.close()
+
+def ujardependencies(root, jars):
     for module in root["modules"]:
         if module.get("dependencies") != None:
             for dependency in module["dependencies"]:
@@ -170,10 +177,6 @@ def ujars(root, jars):
                             dependency["groupId"] = artifacts["groupId"]
                             if artifacts.get("version") != None and artifacts["version"] == "latest":
                                 dependency["version"] = fndlatestversion(dependency["groupId"],dependency["dep"])
-
-    with open("uconfig.yaml","w") as f:
-        f.write(yaml.dump(root))
-        f.close()
 
 # Generate module stucture and application code
 def gmodstr(templatepath, root, groupid, module,configpath):

@@ -28,8 +28,9 @@ If not, see <https://www.gnu.org/licenses/>.
 
     <artifactId>${map.artifactId}</artifactId>
     <version>${map.version}</version>
+    <groupId>${map.groupId}</groupId>
 
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
     <#if map.modules??>
     <modules>
@@ -46,6 +47,7 @@ If not, see <https://www.gnu.org/licenses/>.
             <dependency>
                 <artifactId>${dependencyrow.dep}</artifactId>
                 <groupId>${dependencyrow.groupId}</groupId>
+                <version>${dependencyrow.version}</version>
             </dependency>
             </#list>
         </#list>
@@ -58,51 +60,61 @@ If not, see <https://www.gnu.org/licenses/>.
         <dependency>
             <artifactId>${row.dep}</artifactId>
             <groupId>${row.groupId}</groupId>
+            <version>${row.version}</version>
         </dependency>
         </#list>
     </dependencies>
     </#if>
 
     <#if map.modules??>
-    <plugins>
-        <#list map.modules as row>
-            <#list row.plugins as pluginrow>
-            <plugin>
-                <artifactId>${pluginrow.plugin}</artifactId>
-            </plugin>
+    <build>
+        <sourceDirectory>${'${'}project.basedir${'}'}/src/main/java</sourceDirectory>
+        <testSourceDirectory>${'${'}project.basedir${'}'}/src/test/java</testSourceDirectory>
+        <plugins>
+            <#list map.modules as row>
+                <#list row.plugins as pluginrow>
+                <plugin>
+                    <artifactId>${pluginrow.plugin}</artifactId>
+                </plugin>
+                </#list>
             </#list>
-        </#list>
-    </plugins>
+        </plugins>
+    </build>
     </#if>
 
     <#if map.plugins??>
-    <plugins>
-        <#list map.plugins as row>
-        <plugin>
-            <artifactId>${row.plugin}</artifactId>
-        </plugin>
-        </#list>
-    </plugins>
+    <build>
+        <sourceDirectory>${'${'}project.basedir${'}'}/src/main/java</sourceDirectory>
+        <testSourceDirectory>${'${'}project.basedir${'}'}/src/test/java</testSourceDirectory>
+        <plugins>
+            <#list map.plugins as row>
+            <plugin>
+                <artifactId>${row.plugin}</artifactId>
+            </plugin>
+            </#list>
+        </plugins>
+    </build>
     </#if>
-
 
     <#if map.developers??>
     <developers>
         <#list map.developers as row>
         <developer>
             <id>${row.developer}</id>
+            <roles>
             <#list row.roles as rowroles> 
-            <role>${rowroles.role}</role>
+                <role>${rowroles.role}</role>
             </#list>
+            </roles>
         </developer>
         </#list>
     </developers>
     </#if>
 
     <scm>
-        <connection>scm:git:https://$\{source.repository}/$\{project.artifactId}.git</connection>
-        <url>https://$\{source.repository}/$\{project.artifactId}</url>
-        <developerConnection>scm:git:https://$\{source.repository}/$\{project.artifactId}.git
+        <connection>scm:git:https://${'${'}source.repository${'}'}/${'${'}project.artifactId${'}'}.git</connection>
+        <url>https://${'${'}source.repository${'}'}/${'${'}project.artifactId${'}'}</url>
+        <developerConnection>scm:git:https://${'${'}source.repository${'}'}/${'${'}project.artifactId${'}'}.git
         </developerConnection>
     </scm>
 
