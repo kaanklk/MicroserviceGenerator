@@ -54,8 +54,8 @@ If not, see <https://www.gnu.org/licenses/>.
             </#if>
         </#if>
         <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
-        <maven.compiler.target>8</maven.compiler.target>
-        <maven.compiler.source>$\{java.version}</maven.compiler.source>
+        <maven.compiler.target>${'${'}java.version${'}'}</maven.compiler.target>
+        <maven.compiler.source>${'${'}java.version${'}'}</maven.compiler.source>
         <!-- constants -->
         <#if map.springProfiles??>
             <#list map.springProfiles as row>
@@ -211,6 +211,14 @@ If not, see <https://www.gnu.org/licenses/>.
             <#list row.plugins as plugins>
             <plugin>
                 <artifactId>${plugins.plugin}</artifactId>
+                <groupId>${plugins.groupId}</groupId>
+                <version>${plugins.version}</version>
+                <#if plugins.plugin == "maven-compiler-plugin">
+                    <configuration>
+                        <source>17</source>
+                        <target>17</target>
+                    </configuration>
+                </#if>
             </plugin>
             </#list>
             </#if>
@@ -222,9 +230,9 @@ If not, see <https://www.gnu.org/licenses/>.
     </build>
 
     <scm>
-        <connection>scm:git:https://$\{source.repository}/$\{project.artifactId}.git</connection>
-        <url>https://$\{source.repository}/$\{project.artifactId}</url>
-        <developerConnection>scm:git:https://$\{source.repository}/$\{project.artifactId}.git
+        <connection>scm:git:https://${'${'}source.repository${'}'}/${'${'}project.artifactId${'}'}.git</connection>
+        <url>https://${'${'}source.repository${'}'}/${'${'}project.artifactId${'}'}</url>
+        <developerConnection>scm:git:https://${'${'}source.repository${'}'}/${'${'}project.artifactId${'}'}.git
         </developerConnection>
     </scm>
 

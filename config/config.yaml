@@ -102,13 +102,16 @@ modules:
       - dep: spring-boot-starter-web
       - dep: spring-boot-starter-security
       - dep: spring-cloud-starter-gateway
+      - dep: junit-jupiter-api
+      - dep: spring-boot-starter-test
+    plugins:
+      - plugin: maven-compiler-plugin
     version: 1.0.0-SNAPSHOT
   - artifactId: "stdemo-common"
     version: 1.0.0-SNAPSHOT
     dependencies:
       - dep: spring-boot-starter-data-jpa
       - dep: jackson-annotations
-        scope: compile
       - dep: hibernate-envers
       - dep: spring-security-core
         scope: provided
@@ -120,12 +123,20 @@ modules:
       - dep: javax.servlet-api
         scope: provided
       - dep: spring-boot-starter-data-redis
+      - dep: jaxb-api
+      - dep: jaxb-runtime
+      - dep: jaxb-impl
+      - dep: activation
+    plugins:
+      - plugin: maven-compiler-plugin
   - artifactId: "stdemo-domain"
     version: 1.0.0-SNAPSHOT
     dependencies:
       - dep: spring-boot-starter-data-jpa
       - dep: jackson-annotations
       - dep: hibernate-envers
+    plugins:
+      - plugin: maven-compiler-plugin
   - artifactId: "stdemo-admin"
     version: 1.0.0-SNAPSHOT
     modules:

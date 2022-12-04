@@ -78,6 +78,14 @@ If not, see <https://www.gnu.org/licenses/>.
                 <#list row.plugins as pluginrow>
                 <plugin>
                     <artifactId>${pluginrow.plugin}</artifactId>
+                    <groupId>${pluginrow.groupId}</groupId>
+                    <version>${pluginrow.version}</version>
+                    <#if pluginrow.plugin == "maven-compiler-plugin">
+                    <configuration>
+                        <source>17</source>
+                        <target>17</target>
+                    </configuration>
+                    </#if>
                 </plugin>
                 </#list>
             </#list>
@@ -93,6 +101,14 @@ If not, see <https://www.gnu.org/licenses/>.
             <#list map.plugins as row>
             <plugin>
                 <artifactId>${row.plugin}</artifactId>
+                <groupId>${row.groupId}</groupId>
+                <version>${row.version}</version>
+                <#if row.plugin == "maven-compiler-plugin">
+                <configuration>
+                    <source>17</source>
+                    <target>17</target>
+                </configuration>
+                </#if>
             </plugin>
             </#list>
         </plugins>

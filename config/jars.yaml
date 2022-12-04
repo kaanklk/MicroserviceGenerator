@@ -92,6 +92,21 @@ artifacts:
   - artifactId: jackson-annotations
     groupId: com.fasterxml.jackson.core
     version: latest
+  - artifactId: junit-jupiter-api
+    groupId: org.junit.jupiter
+    version: latest
+  - artifactId: jaxb-api
+    groupId: javax.xml.bind
+    version: latest
+  - artifactId: jaxb-runtime
+    groupId: org.glassfish.jaxb
+    version: latest
+  - artifactId: jaxb-impl
+    groupId: com.sun.xml.bind
+    version: latest
+  - artifactId: activation
+    groupId: javax.activation
+    version: latest
 plugins:
   - artifactId: maven-compiler-plugin
     groupId: org.apache.maven.plugins
