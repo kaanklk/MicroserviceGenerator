@@ -153,12 +153,33 @@ def gparentmod(templatepath, outputpath, root, configpath):
 def ujars(root, jars):
 
     print("Updating jars...")
-
+    
     ujardependencies(root, jars)
+
+    ujarplugins(root, jars)
 
     with open("uconfig.yaml","w") as f:
         f.write(yaml.dump(root))
         f.close()
+
+def ujarplugins(root, jars):
+    for module in root["modules"]:
+        if module.get("plugins") != None:
+            for plugin in module["plugins"]:
+                for plugins in jars["plugins"]:
+                    if plugin["plugin"] == plugins["artifactId"]:
+                        plugin["groupId"] = plugins["groupId"]
+                        if plugins.get("version") != None and plugins["version"] == "latest":
+                            plugin["version"] = fndlatestversion(plugin["groupId"],plugin["plugin"])
+        else:
+            if module.get("modules") != None:
+                for submodule in module["modules"]:
+                    for plugin in submodule["plugins"]:
+                        for plugins in jars["plugins"]:
+                            if plugin["plugin"] == plugins["artifactId"]:
+                                plugin["groupId"] = plugins["groupId"]
+                                if plugins.get("version") != None and plugins["version"] == "latest":
+                                    plugin["version"] = fndlatestversion(plugin["groupId"],plugin["plugin"])
 
 def ujardependencies(root, jars):
     for module in root["modules"]:
