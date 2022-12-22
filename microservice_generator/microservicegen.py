@@ -34,9 +34,9 @@ def rconf(configpath):
 def pargs():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-t", "--Template", help = "Determine template location", required=False)
-    parser.add_argument("-c", "--Config", help = "Determine config path" , required=False)
-    parser.add_argument("-o", "--Output", help = "Determine output directory", required=False)
+    parser.add_argument("-t", "--Template", help = "Determine template directory", required=True)
+    parser.add_argument("-c", "--Config", help = "Determine config directory" , required=True)
+    parser.add_argument("-o", "--Output", help = "Determine output directory", required=True)
 
     return parser.parse_args()
 

@@ -33,6 +33,7 @@ def cmodule(templatepath,outputpath,root,configpath):
     jars = rjarsconf(configpath)
 
     os.chdir(configpath.as_posix())
+    
     ujars(root,jars)
 
     gparentmod(templatepath,outputpath,root,configpath)
